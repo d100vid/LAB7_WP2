@@ -1,8 +1,10 @@
 name: Lab 7
-#TODO The pipeline should be triggered only on push to a "test" branch
+
+# The pipeline should be triggered only on push to a "test" branch
 on:
   push:
-  pull_request:
+    branches:
+      - test
 
 jobs:
   test:
@@ -22,8 +24,22 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
-      # TODO: Run backend tests in the pipeline
 
-      # TODO: Run the Jacoco report in the pipeline (Jacoco already exists)
+      # Run backend tests in the pipeline
+      - name: Run backend tests
+        env:
+          MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+        run: ./gradlew test
 
-      # TODO: Set GitHub secrets and read them in the pipeline (for the environmentTest)
+      # Run the Jacoco report in the pipeline
+      - name: Generate JaCoCo coverage report
+        env:
+          MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+        run: ./gradlew jacocoTestReport
+
+      # Upload JaCoCo report as artifact
+      - name: Upload JaCoCo report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/test/html
