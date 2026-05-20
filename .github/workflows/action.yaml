@@ -10,6 +10,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    # GitHub Secret passed as environment variable for Lab7Test.java
+    env:
+      MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -27,17 +31,13 @@ jobs:
 
       # Run backend tests in the pipeline
       - name: Run backend tests
-        env:
-          MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
         run: ./gradlew test
 
       # Run the Jacoco report in the pipeline
       - name: Generate JaCoCo coverage report
-        env:
-          MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
         run: ./gradlew jacocoTestReport
 
-      # Upload JaCoCo report as artifact
+      # Optional: upload the JaCoCo HTML report so it can be downloaded from GitHub Actions
       - name: Upload JaCoCo report
         uses: actions/upload-artifact@v4
         with:
